@@ -20,6 +20,8 @@ async function connectDB () {
         await client.connect()
 
         const smartDB = client.db('smartDB')
+        const productCollection = db.collection('products')
+
     } catch (err) {
         console.error(err)
     }
