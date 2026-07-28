@@ -23,9 +23,10 @@ async function connectDB() {
         const smartDB = client.db("smartDB");
         const productCollection = smartDB.collection("products");
         const usersCollection = smartDB.collection('users')
+        const bidsCollection = smartDB.collection('bids')
 
         app.get("/products", async (req, res) => {
-            const result = await productCollection.find().toArray();
+            const result = await productCollection.find().sort({postedAt: -1}).toArray();
             res.send(result);
         });
 
@@ -40,6 +41,31 @@ async function connectDB() {
                 res.send(result)
             }
         })
+        app.post('/products', async (req, res) => {
+            const product = req.body;
+            const result = await productCollection.insertOne(product)
+            res.send(product)
+        })
+
+        app.post('/bids', async (req, res) => {
+            const bid = req.body
+            const query = {
+                productId: bid.productId,
+                "buyer.email": bid.buyer.email
+            };
+            const isExist = await bidsCollection.findOne(query)
+            
+            if(isExist) {
+                res.send({
+                    success: false,
+                    message: 'You have already placed a bid on this product.'
+                })
+            }
+
+            const result = await bidsCollection.insertOne(bid)
+            res.send(result)
+        })
+
     } catch (err) {
         console.error(err);
     }
