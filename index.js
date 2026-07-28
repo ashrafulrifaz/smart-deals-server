@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -78,6 +78,13 @@ async function connectDB() {
                 const result = await bidsCollection.insertOne(bid)
                 res.send(result)
             }
+        })
+
+        app.delete('/bids/:id', async (req, res) => {
+            const id = req.params.id
+            const query = {_id: new ObjectId(id)}
+            const result = await bidsCollection.deleteOne(query)
+            res.send(result)
         })
 
     } catch (err) {
