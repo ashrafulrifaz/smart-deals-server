@@ -30,6 +30,20 @@ async function connectDB() {
             res.send(result);
         });
 
+        app.get('/bids', async (req, res) => {
+            const email = req.query.email
+            const query = {"buyer.email": email}
+            const result = await bidsCollection.find(query).toArray()
+            res.send(result)
+        })
+
+        app.get('/bids/byProduct/:productId', async (req, res) => {
+            const productId = req.params.productId
+            const query = {productId: productId}
+            const result = await bidsCollection.find(query).toArray()
+            res.send(result)
+        })
+
         app.post('/users', async (req, res) => {
             const user = req.body;
             const query = {email: user.email}
@@ -60,10 +74,10 @@ async function connectDB() {
                     success: false,
                     message: 'You have already placed a bid on this product.'
                 })
+            } else {
+                const result = await bidsCollection.insertOne(bid)
+                res.send(result)
             }
-
-            const result = await bidsCollection.insertOne(bid)
-            res.send(result)
         })
 
     } catch (err) {
